@@ -1,0 +1,10 @@
+0.7
+2020.2
+May 22 2024
+19:03:11
+C:/Users/lupi1/Documents/Vivado/Project_Elevator/Project_Elevator.sim/sim_1/behav/xsim/glbl.v,1708598507,verilog,,,,glbl,,,,,,,,
+C:/Users/lupi1/Documents/Vivado/Project_Elevator/Project_Elevator.srcs/sources_1/new/Project_Elevator.v,1731916668,verilog,,C:/Users/lupi1/Documents/Vivado/Project_Elevator/Project_Elevator.srcs/sources_1/new/test_simulation.v,,Project_Elevator,,,,,,,,
+C:/Users/lupi1/Documents/Vivado/Project_Elevator/Project_Elevator.srcs/sources_1/new/elevator.v,1731909716,verilog,,C:/Users/lupi1/Documents/Vivado/Project_Elevator/Project_Elevator.srcs/sources_1/new/oneshot_universal.v,,elevator,,,,,,,,
+C:/Users/lupi1/Documents/Vivado/Project_Elevator/Project_Elevator.srcs/sources_1/new/oneshot_universal.v,1731864756,verilog,,C:/Users/lupi1/Documents/Vivado/Project_Elevator/Project_Elevator.srcs/sources_1/new/seg7_controller.v,,oneshot_universal,,,,,,,,
+C:/Users/lupi1/Documents/Vivado/Project_Elevator/Project_Elevator.srcs/sources_1/new/seg7_controller.v,1731911519,verilog,,C:/Users/lupi1/Documents/Vivado/Project_Elevator/Project_Elevator.srcs/sources_1/new/Project_Elevator.v,,seg7_controller,,,,,,,,
+C:/Users/lupi1/Documents/Vivado/Project_Elevator/Project_Elevator.srcs/sources_1/new/test_simulation.v,1731911634,verilog,,,,test_simulation,,,,,,,,

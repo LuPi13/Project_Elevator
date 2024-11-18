@@ -12,8 +12,8 @@ reg [7:0] display_select;
 output reg [7:0] seg_data;
 output reg [7:0] seg_sel;
 
-always @(posedge rst or posedge clk) begin //seg_sel loop
-    if (rst) seg_sel <= 8'b11111110;
+always @(negedge rst or posedge clk) begin //seg_sel loop
+    if (!rst) seg_sel <= 8'b11111110;
     else seg_sel <= {seg_sel[6:0], seg_sel[7]};
 end
 

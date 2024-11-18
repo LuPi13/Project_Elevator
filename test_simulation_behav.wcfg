@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="test_simulation_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="test_simulation" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="8,129.800805880 ms"></ZoomStartTime>
+      <ZoomEndTime time="8,143.930805881 ms"></ZoomEndTime>
+      <Cursor1Time time="115.619174435 ms"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="160"></NameColumnWidth>
+      <ValueColumnWidth column_width="116"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="14" />
+   <wvobject fp_name="/test_simulation/destination" type="array">
+      <obj_property name="ElementShortName">destination[6:0]</obj_property>
+      <obj_property name="ObjectShortName">destination[6:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test_simulation/emergency" type="array">
+      <obj_property name="ElementShortName">emergency[1:0]</obj_property>
+      <obj_property name="ObjectShortName">emergency[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test_simulation/summon" type="logic">
+      <obj_property name="ElementShortName">summon</obj_property>
+      <obj_property name="ObjectShortName">summon</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test_simulation/ev_simul/summon_trig" type="logic">
+      <obj_property name="ElementShortName">summon_trig</obj_property>
+      <obj_property name="ObjectShortName">summon_trig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test_simulation/close" type="logic">
+      <obj_property name="ElementShortName">close</obj_property>
+      <obj_property name="ObjectShortName">close</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test_simulation/ev_simul/door_status" type="array">
+      <obj_property name="ElementShortName">door_status[1:0]</obj_property>
+      <obj_property name="ObjectShortName">door_status[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test_simulation/depart" type="array">
+      <obj_property name="ElementShortName">depart[6:0]</obj_property>
+      <obj_property name="ObjectShortName">depart[6:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test_simulation/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test_simulation/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test_simulation/seg_data" type="array">
+      <obj_property name="ElementShortName">seg_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">seg_data[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test_simulation/seg_sel" type="array">
+      <obj_property name="ElementShortName">seg_sel[7:0]</obj_property>
+      <obj_property name="ObjectShortName">seg_sel[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test_simulation/ev_simul/ev1_cnt" type="array">
+      <obj_property name="ElementShortName">ev1_cnt[15:0]</obj_property>
+      <obj_property name="ObjectShortName">ev1_cnt[15:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test_simulation/ev_simul/ev1_state" type="array">
+      <obj_property name="ElementShortName">ev1_state[3:0]</obj_property>
+      <obj_property name="ObjectShortName">ev1_state[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test_simulation/ev_simul/ev1_control" type="array">
+      <obj_property name="ElementShortName">ev1_control[11:0]</obj_property>
+      <obj_property name="ObjectShortName">ev1_control[11:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+</wave_config>
