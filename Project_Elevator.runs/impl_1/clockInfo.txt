@@ -1,6 +1,6 @@
 -------------------------------------
 | Tool Version : Vivado v.2024.1
-| Date         : Mon Nov 18 16:20:26 2024
+| Date         : Mon Nov 18 17:49:12 2024
 | Host         : LuPi14
 | Design       : design_1
 | Device       : xc7s75-fgga484-1--

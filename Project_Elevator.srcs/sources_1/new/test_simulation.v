@@ -23,13 +23,14 @@ module test_simulation();
         clk <= 0;
         depart <= 7'b0000000;
         summon <= 0;
+        close <= 0;
         #10 rst <= 0;
         #10 rst <= 1;
 
-        #100 depart <= 7'b0001000;
+        #100 depart <= 7'b0100000;
         #10 summon <= 1;
         #10 summon <= 0;
-        #9000 destination <= 7'b0100000;
+        #5000 destination <= 7'b0000010;
         #10 destination <= 7'b0000000;
         #300 close <= 1;
         #10 close <= 0;

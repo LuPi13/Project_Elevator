@@ -43,11 +43,17 @@ module Project_Elevator(destination, emergency, summon, close, depart, seg_data,
         
     always @(negedge rst or posedge clk) begin //엘리베이터 호출
         if(!rst) begin
+            ev1_state <= IDLE;
+            ev2_state <= IDLE;
+            door_status <= 2'b00;
+            summoner <= 4'd0;
             ev1_summoner <= 4'd0;
             ev2_summoner <= 4'd0;
+            ev1_state <= IDLE;
+            ev1_cnt <= 0;
+            ev1_target <= 0;
             ev1_control <= 12'b0001_1101_0000; //0001: 현재 1층, 1101: -(이동중 아님), 0000: 카운터
             ev2_control <= 12'b0001_1101_0000;
-            summoner <= 4'd0;
         end
         else begin
             if(summon_trig == 1) begin
@@ -128,6 +134,7 @@ module Project_Elevator(destination, emergency, summon, close, depart, seg_data,
                 DOOR_OPEN: begin
                     if(ev1_cnt >= 4000 || close_trig == 1) begin
                         ev1_cnt <= 1;
+                        door_status[1] <= 0;
                         ev1_state <= DOOR_CLOSING;
                     end
                     else if(summoner == ev1_control[11:8]) ev1_cnt <= 1;

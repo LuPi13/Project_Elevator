@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.1 (win64) Build 5076996 Wed May 22 18:37:14 MDT 2024
-| Date         : Mon Nov 18 16:19:48 2024
+| Date         : Mon Nov 18 17:48:33 2024
 | Host         : LuPi14 running 64-bit major release  (build 9200)
 | Command      : report_utilization -file Project_Elevator_utilization_synth.rpt -pb Project_Elevator_utilization_synth.pb
 | Design       : Project_Elevator
@@ -148,8 +148,8 @@ Warning! For any ECO changes, please run place_design if there are unplaced inst
 +----------+------+---------------------+
 | Ref Name | Used | Functional Category |
 +----------+------+---------------------+
-| OBUFT    |   25 |                  IO |
-| OBUF     |   17 |                  IO |
+| OBUFT    |   24 |                  IO |
+| OBUF     |   18 |                  IO |
 | FDPE     |    7 |        Flop & Latch |
 | LUT5     |    3 |                 LUT |
 | IBUF     |    2 |                  IO |

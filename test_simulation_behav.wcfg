@@ -11,15 +11,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="8,129.800805880 ms"></ZoomStartTime>
-      <ZoomEndTime time="8,143.930805881 ms"></ZoomEndTime>
-      <Cursor1Time time="115.619174435 ms"></Cursor1Time>
+      <ZoomStartTime time="12.500000000 ms"></ZoomStartTime>
+      <ZoomEndTime time="21.570000001 ms"></ZoomEndTime>
+      <Cursor1Time time="30,000.001000000 ms"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="160"></NameColumnWidth>
+      <NameColumnWidth column_width="152"></NameColumnWidth>
       <ValueColumnWidth column_width="116"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="14" />
+   <WVObjectSize size="15" />
    <wvobject fp_name="/test_simulation/destination" type="array">
       <obj_property name="ElementShortName">destination[6:0]</obj_property>
       <obj_property name="ObjectShortName">destination[6:0]</obj_property>
@@ -39,6 +39,10 @@
    <wvobject fp_name="/test_simulation/close" type="logic">
       <obj_property name="ElementShortName">close</obj_property>
       <obj_property name="ObjectShortName">close</obj_property>
+   </wvobject>
+   <wvobject fp_name="/test_simulation/ev_simul/close_trig" type="logic">
+      <obj_property name="ElementShortName">close_trig</obj_property>
+      <obj_property name="ObjectShortName">close_trig</obj_property>
    </wvobject>
    <wvobject fp_name="/test_simulation/ev_simul/door_status" type="array">
       <obj_property name="ElementShortName">door_status[1:0]</obj_property>
