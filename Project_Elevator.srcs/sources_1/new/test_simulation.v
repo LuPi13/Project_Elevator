@@ -30,10 +30,20 @@ module test_simulation();
         #100 depart <= 7'b0100000;
         #10 summon <= 1;
         #10 summon <= 0;
-        #5000 destination <= 7'b0000010;
+        #5000 destination <= 7'b0001000;
         #10 destination <= 7'b0000000;
         #300 close <= 1;
         #10 close <= 0;
+        #3000 depart <= 7'b0000010;
+        #10 summon <= 1;
+        #10 summon <= 0;
+        #13000 destination <= 7'b0100000;
+        #10 destination <= 7'b0000000;
+        #300 close <= 1;
+        #10 close <= 1;
+        #13000 depart <= 7'b0100000;
+        #10 summon <= 1;
+        #10 summon <= 0;
     end
 
     always begin

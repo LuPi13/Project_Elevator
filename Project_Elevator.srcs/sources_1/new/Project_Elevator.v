@@ -35,25 +35,22 @@ module Project_Elevator(destination, emergency, summon, close, depart, seg_data,
     reg [3:0] ev2_state;
     reg [11:0] ev1_control;
     reg [11:0] ev2_control;
+    reg [11:0] emergency_cnt;
+    reg [12:0] lcd_cnt;
+    reg [3:0] lcd_state;
 
     seg7_controller seg7(ev1_control, ev2_control, seg_data, seg_sel, rst, clk);    
     
     parameter IDLE = 4'b0000, EMERGENCY = 4'b1111, DOOR_OPEN = 4'b0001, MOVE_TO_DEP = 4'b0010, MOVE_TO_DEST = 4'b0011, DOOR_OPENING = 4'b0100, DOOR_CLOSING = 4'b0101;
+
+    parameter DELAY = 4'b1000, FUNCTION_SET = 4'b1001, ENTRY_MODE = 4'b1010, DISP_ONOFF = 4'b1011, LINE1 = 4'b1100, LINE2 = 4'b1101, DELAY_T = 4'b1110, CLEAR_DISP = 4'b1111;
     
-        
-    always @(negedge rst or posedge clk) begin //엘리베이터 호출
+    
+    always @(negedge rst or posedge clk) begin //호출버튼 제어
         if(!rst) begin
-            ev1_state <= IDLE;
-            ev2_state <= IDLE;
-            door_status <= 2'b00;
             summoner <= 4'd0;
             ev1_summoner <= 4'd0;
             ev2_summoner <= 4'd0;
-            ev1_state <= IDLE;
-            ev1_cnt <= 0;
-            ev1_target <= 0;
-            ev1_control <= 12'b0001_1101_0000; //0001: 현재 1층, 1101: -(이동중 아님), 0000: 카운터
-            ev2_control <= 12'b0001_1101_0000;
         end
         else begin
             if(summon_trig == 1) begin
@@ -67,12 +64,43 @@ module Project_Elevator(destination, emergency, summon, close, depart, seg_data,
                     7'b1000000: summoner <= 1;
                     default: summoner <= 0;
                 endcase
-                ev1_distance = (summoner - ev1_control[11:8] + 7) % 7;
-                ev2_distance = (summoner - ev2_control[11:8] + 7) % 7;
             end
+        end
+    end
+    
+//호출 시 엘리베이터 거리 계산, 호출 버튼 누르는 순간에만 올바른 계산함, 이외에는 현재층 출력(쓸 일 없음)
+    always @(negedge rst or posedge clk) begin
+        if(!rst) begin
+            ev1_distance <= 0;
+            ev2_distance <= 0;
+        end
+        else begin
+            ev1_distance = (summoner > ev1_control[11:8]) ? (summoner - ev1_control[11:8]) : (ev1_control[11:8] - summoner);
+            ev2_distance = (summoner > ev2_control[11:8]) ? (summoner - ev2_control[11:8]) : (ev2_control[11:8] - summoner);
+        end
+    end
 
+
+    always @(negedge rst or posedge clk) begin //엘리베이터 호출
+        if(!rst) begin
+            ev1_state <= IDLE;
+            ev2_state <= IDLE;
+            door_status <= 2'b00;
+            ev1_state <= IDLE;
+            ev1_cnt <= 0;
+            ev1_target <= 0;
+            ev1_control <= 12'b0001_1101_0000; //0001: 현재 1층, 1101: -(이동중 아님), 0000: 카운터
+            ev2_control <= 12'b0001_1101_0000;
+        end
+        else begin
             if(summoner != 0) begin
-                if(((ev1_state == IDLE) && (ev2_state != IDLE)) ||
+                if((ev1_state == DOOR_OPEN) && (ev1_distance == 0)) begin
+                    ev1_cnt <= 1;
+                end
+                else if((ev2_state == DOOR_OPEN) && (ev2_distance == 0)) begin
+                    ev2_cnt <= 1;
+                end
+                else if(((ev1_state == IDLE) && (ev2_state != IDLE)) ||
                 ((ev1_state == IDLE) && (ev2_state == IDLE) && (ev1_distance <= ev2_distance))) begin
                     ev1_cnt <= 1;
                     ev1_state <= MOVE_TO_DEP;
@@ -83,6 +111,7 @@ module Project_Elevator(destination, emergency, summon, close, depart, seg_data,
                     ev2_state <= MOVE_TO_DEP;
                     ev2_summoner <= summoner;
                 end
+                summoner <= 0;
             end
         end
     end
@@ -195,6 +224,299 @@ module Project_Elevator(destination, emergency, summon, close, depart, seg_data,
                         end
                     end
                 end
+            endcase
+        end
+    end
+
+    always @(negedge rst or posedge clk) begin //ev2 state 제어
+        if(!rst) begin
+            ev2_state <= IDLE;
+            ev2_cnt <= 0;
+            ev2_target <= 0;
+        end
+        else begin
+            ev2_control[3:0] <= ev2_cnt / 1000;
+            case(ev2_state)
+                MOVE_TO_DEP: begin
+                    if(ev2_control[11:8] == ev2_summoner) begin
+                        ev2_cnt <= 1;
+                        ev2_control[7:4] <= 4'b1101;
+                        ev2_state <= DOOR_OPENING;
+                        summoner <= 0;
+                    end
+                    else begin
+                        ev2_cnt <= ev2_cnt + 1;
+                        if(ev2_control[11:8] < ev2_summoner) begin
+                            if (ev2_cnt % 2000 == 0) begin
+                                ev2_control[11:8] <= ev2_control[11:8] + 1;
+                                ev2_cnt <=1;
+                            end
+                            ev2_control[7:4] <= 4'b1111;
+                        end
+                        else begin
+                            if (ev2_cnt % 2000 == 0) begin
+                                ev2_control[11:8] <= ev2_control[11:8] - 1;
+                                ev2_cnt <= 1;
+                            end
+                            ev2_control[7:4] <= 4'b1110;
+                        end
+                    end
+                end
+                DOOR_OPENING: begin
+                    if(ev2_cnt >= 2000) begin
+                        ev2_cnt <= 1;
+                        ev2_state <= DOOR_OPEN;
+                        ev2_control[7:4] <= 4'b1101;
+                    end
+                    else begin
+                        ev2_cnt <= ev2_cnt + 1;
+                    end
+                end
+                DOOR_OPEN: begin
+                    if(ev2_cnt >= 4000 || close_trig == 1) begin
+                        ev2_cnt <= 1;
+                        door_status[0] <= 0;
+                        ev2_state <= DOOR_CLOSING;
+                    end
+                    else if(summoner == ev2_control[11:8]) ev2_cnt <= 1;
+                    else begin
+                        ev2_cnt <= ev2_cnt + 1;
+                        door_status[0] <= 1;
+                        if(|destination) begin
+                            case(destination)
+                                7'b1000000: ev2_target <= 1;
+                                7'b0100000: ev2_target <= 2;
+                                7'b0010000: ev2_target <= 3;
+                                7'b0001000: ev2_target <= 4;
+                                7'b0000100: ev2_target <= 5;
+                                7'b0000010: ev2_target <= 6;
+                                7'b0000001: ev2_target <= 7;
+                                default: ev2_target <= 0;
+                            endcase
+                        end
+                    end
+                end
+                DOOR_CLOSING: begin
+                    if(ev2_cnt >= 2000) begin
+                        if(ev2_target == 0) begin
+                            ev2_cnt <= 0;
+                            ev2_state <= IDLE;
+                        end
+                        else begin
+                            ev2_cnt <= 1;
+                            ev2_state <= MOVE_TO_DEST;
+                        end
+                    end
+                    else begin
+                        ev2_cnt <= ev2_cnt + 1;
+                    end
+                end
+                MOVE_TO_DEST: begin
+                    if(ev2_control[11:8] == ev2_target) begin
+                        ev2_cnt <= 1;
+                        ev2_control[7:4] <= 4'b1101;
+                        ev2_target <= 0;
+                        ev2_state <= DOOR_OPENING;
+                    end
+                    else begin
+                        ev2_cnt <= ev2_cnt + 1;
+                        if(ev2_control[11:8] < ev2_target) begin
+                            if (ev2_cnt % 2000 == 0) begin
+                                ev2_control[11:8] <= ev2_control[11:8] + 1;
+                                ev2_cnt <= 1;
+                            end
+                            ev2_control[7:4] <= 4'b1111;
+                        end
+                        else begin
+                            if (ev2_cnt % 2000 == 0) begin
+                                ev2_control[11:8] <= ev2_control[11:8] - 1;
+                                ev2_cnt <= 1;
+                            end
+                            ev2_control[7:4] <= 4'b1110;
+                        end
+                    end
+                end
+            endcase
+        end
+    end
+
+
+    always @(negedge rst or posedge clk) begin //emergency 제어, 불빛
+        if(!rst) begin
+            emergency_cnt <= 0;
+        end
+        else begin
+            if(emergency_cnt >= 4'd1000) begin
+                emergency_cnt <= 1;
+            end
+            else begin
+                emergency_cnt <= emergency_cnt + 1;
+            end
+            if((ev1_state != EMERGENCY) && (emergency[1] == 1)) begin
+                ev1_state <= EMERGENCY;
+                door_status[1] <= 1;
+                ev1_cnt <= 0;
+                ev1_control[7:4] <= 4'b1101;
+            end
+            if((ev2_state != EMERGENCY) && (emergency[0] == 1)) begin
+                ev2_state <= EMERGENCY;
+                door_status[0] <= 1;
+                ev2_cnt <= 0;
+                ev2_control[7:4] <= 4'b1101;
+            end
+
+            if((ev1_state == EMERGENCY) && (ev2_state != EMERGENCY)) begin
+                if(emergency_cnt <= 500) begin
+                    RGB <= 12'b100_110_000_000;
+                end
+                else begin
+                    RGB <= 12'b110_100_000_000;
+                end
+            end
+
+            else if((ev2_state == EMERGENCY) && (ev1_state != EMERGENCY)) begin
+                if(emergency_cnt <= 500) begin
+                    RGB <= 12'b000_000_110_100;
+                end
+                else begin
+                    RGB <= 12'b000_000_100_110;
+                end
+            end
+
+            else begin
+                if(emergency_cnt <= 500) begin
+                    RGB <= 12'b110_100_110_100;
+                end
+                else begin
+                    RGB <= 12'b100_110_100_110;
+                end
+            end
+        end
+    end
+
+
+    always @(posedge clk or negedge rst) begin //LCD state
+        if(!rst) begin
+            lcd_state = DELAY;
+            lcd_cnt <= 0;
+            end
+        
+        else begin
+            lcd_cnt <= lcd_cnt + 1;
+            case (lcd_state)
+                DELAY: begin
+                    if(lcd_cnt == 70) begin
+                        lcd_state = FUNCTION_SET;
+                        lcd_cnt <= 0;
+                    end
+                end
+                FUNCTION_SET: begin
+                    if(lcd_cnt == 30) begin
+                        lcd_state = DISP_ONOFF;
+                        lcd_cnt <= 0;
+                    end
+                end
+                DISP_ONOFF: begin
+                    if(lcd_cnt == 30) begin
+                        lcd_state = ENTRY_MODE;
+                        lcd_cnt <= 0;
+                    end
+                end
+                ENTRY_MODE: begin
+                    if(lcd_cnt == 30) begin
+                        lcd_state = LINE1;
+                        lcd_cnt <= 0;
+                    end
+                end
+                LINE1: begin
+                    if(lcd_cnt == 20) begin
+                        lcd_state = LINE2;
+                        lcd_cnt <= 0;
+                    end
+                end
+                LINE2: begin
+                    if(lcd_cnt == 20) begin
+                        lcd_state = DELAY_T;
+                        lcd_cnt <= 0;
+                    end
+                end
+                DELAY_T: begin
+                    if(lcd_cnt == 5) begin
+                        lcd_state = CLEAR_DISP;
+                        lcd_cnt <= 0;
+                    end
+                end
+                CLEAR_DISP: begin
+                    if(lcd_cnt == 5) begin
+                        lcd_state = LINE1;
+                        lcd_cnt <= 0;
+                    end
+                end
+            endcase
+        end
+    end
+
+    always @(posedge clk or negedge rst) begin
+        if(!rst) {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_1_00000000;
+        else begin
+            case(lcd_state)
+                FUNCTION_SET:
+                    {LCD_RS, LCD_RW, LCD_DATA} = 10'b0_0_00111000;
+                DISP_ONOFF:
+                    {LCD_RS, LCD_RW, LCD_DATA} = 10'b0_0_00001100;
+                ENTRY_MODE:
+                    {LCD_RS, LCD_RW, LCD_DATA} = 10'b0_0_00000110;
+                LINE1: begin
+                    case(lcd_cnt)
+                        00: {LCD_RS, LCD_RW, LCD_DATA} = 10'b0_0_10000011;
+                        01: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00100000;
+                        02: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_01001000;
+                        03: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_01000101;
+                        04: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_01001100;
+                        05: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_01001100;
+                        06: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_01001111;
+                        07: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00100000;
+                        08: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_01010111;
+                        09: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_01001111;
+                        10: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_01010010;
+                        11: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_01001100;
+                        12: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_01000100;
+                        13: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00100001;
+                        14: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00100000;
+                        15: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00100000;
+                        16: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00100000;
+                        default: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00100000;
+                    endcase
+                end
+                
+                LINE2: begin
+                    case(lcd_cnt)
+                        00: {LCD_RS, LCD_RW, LCD_DATA} = 10'b0_0_11000011;
+                        01: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00110010;
+                        02: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00110000;
+                        03: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00110010;
+                        04: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00110001;
+                        05: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00110100;
+                        06: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00110100;
+                        07: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00110000;
+                        08: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00110001;
+                        09: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00110010;
+                        10: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00110001;
+                        11: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00100000;
+                        12: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_01001010;
+                        13: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_01010111;
+                        14: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00100000;
+                        15: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00100000;
+                        16: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00100000;
+                        default: {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_0_00100000;
+                    endcase
+                end
+                DELAY_T:
+                    {LCD_RS, LCD_RW, LCD_DATA} = 10'b0_0_00000010;
+                CLEAR_DISP:
+                    {LCD_RS, LCD_RW, LCD_DATA} = 10'b0_0_00000001;
+                default:
+                    {LCD_RS, LCD_RW, LCD_DATA} = 10'b1_1_00000000;
             endcase
         end
     end

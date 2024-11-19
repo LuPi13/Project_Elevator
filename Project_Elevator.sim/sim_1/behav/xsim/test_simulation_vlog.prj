@@ -1,6 +1,5 @@
 # compile verilog/system verilog design source files
 verilog xil_defaultlib  \
-"../../../../Project_Elevator.srcs/sources_1/new/elevator.v" \
 "../../../../Project_Elevator.srcs/sources_1/new/oneshot_universal.v" \
 "../../../../Project_Elevator.srcs/sources_1/new/seg7_controller.v" \
 "../../../../Project_Elevator.srcs/sources_1/new/Project_Elevator.v" \
