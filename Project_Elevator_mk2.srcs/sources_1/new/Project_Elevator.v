@@ -129,14 +129,16 @@ module Project_Elevator(destination, emergency, summon, close, depart, seg_data,
             + (ev1_state == MOVE_TO_DEP ? 4 : 0)
             + (ev1_state == DOOR_OPENING ? 4 : 0)
             + (ev1_state == DOOR_OPEN ? 3 : 0)
-            + (ev1_state == DOOR_CLOSING ? 1 : 0);
+            + (ev1_state == DOOR_CLOSING ? 1 : 0)
+            + (ev1_state == EMERGENCY ? 1000 : 0);
             ev2_eta <= (((ev2_control[11:8] >= ev2_target) ? ev2_control[11:8] - ev2_target : ev2_target - ev2_control[11:8])
             + ((ev2_target >= reserver) ? ev2_target - reserver : reserver - ev2_target))
             + (ev2_state == MOVE_TO_DEST ? 4 : 0)
             + (ev2_state == MOVE_TO_DEP ? 4 : 0)
             + (ev2_state == DOOR_OPENING ? 4 : 0)
             + (ev2_state == DOOR_OPEN ? 3 : 0)
-            + (ev2_state == DOOR_CLOSING ? 1 : 0);
+            + (ev2_state == DOOR_CLOSING ? 1 : 0)
+            + (ev2_state == EMERGENCY ? 1000 : 0);
         end
     end
 
